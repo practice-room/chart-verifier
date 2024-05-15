@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  greet:
+  renovate:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@latest
+      uses: actions/checkout@v4
     - name: Run Renovate
       uses: renovatebot/github-action@v40.1.11
       with:
