@@ -2,8 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "enabledManagers": [
     "gomod",
-    "pip_requirements",
-    "github-actions"
   ],
   "platform": "github",
   "branchPrefix": "renovate/",
