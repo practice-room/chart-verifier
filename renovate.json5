@@ -1,11 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "enabledManagers": [
+    "gomod",
+    "pip_requirements",
+    "github-actions"
+  ],
   "platform": "github",
-  "branchPrefix": "reno-",
+  "branchPrefix": "renovate/",
   "repositories": [
-    "practice-room/chart-verifier",
+    "practice-room/chart-verifier"
   ],
   "postUpdateOptions": [
-    "gomodTidy",
+    "gomodTidy"
   ]
 }
