@@ -4,5 +4,8 @@
   "branchPrefix": "reno-",
   "repositories": [
     "practice-room/chart-verifier",
+  ],
+  "postUpdateOptions": [
+    "gomodTidy",
   ]
 }
