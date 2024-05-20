@@ -8,6 +8,7 @@
   "repositories": [
     "practice-room/chart-verifier"
   ],
+  "dependencyDashboard": true,
   "postUpdateOptions": [
     "gomodTidy"
   ]
