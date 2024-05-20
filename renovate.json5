@@ -1,7 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "enabledManagers": [
-    "gomod"
+    "gomod",
+    "pip_requirements",
+    "github-actions"
   ],
   "extends": [
     "group:kubernetes",
@@ -10,10 +12,10 @@
   "platform": "github",
   "branchPrefix": "renovate/",
   "repositories": [
-    "practice-room/chart-verifier"
+    "redhat-certification/chart-verifier"
   ],
-  "dependencyDashboard": true,
   "postUpdateOptions": [
     "gomodTidy"
-  ]
+  ],
+  "automerge": false
 }
