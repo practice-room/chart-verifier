@@ -17,7 +17,7 @@ require (
 	golang.org/x/mod v0.14.0
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v3 v3.13.3
-	k8s.io/api v0.28.4
+	k8s.io/api v0.30.1
 	k8s.io/apimachinery v0.28.4
 	k8s.io/client-go v0.28.4
 	k8s.io/kubectl v0.28.4
