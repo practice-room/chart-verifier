@@ -17,5 +17,5 @@
   "postUpdateOptions": [
     "gomodTidy"
   ],
-  "automerge": false
+  "automerge": "foo"
 }
