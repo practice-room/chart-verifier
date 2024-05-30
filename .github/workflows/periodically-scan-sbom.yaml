@@ -1,0 +1,28 @@
+name: Scan Repository SBOM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  grype:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          # Setting path to null works around this bug:
+          # https://github.com/anchore/sbom-action/issues/389
+          path: null
+          file: go.mod
+          format: spdx-json
+          output-file: temporary.sbom.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+      - name: Scan SBOM
+        uses: anchore/scan-action@v3
+        with:
+          sbom: temporary.sbom.spdx.json
+        
+      
