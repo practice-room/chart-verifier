@@ -6,17 +6,14 @@ on:
 
 jobs:
   generate-src-sbom:
+    env:
+      SBOM_FILE_NAME: "${{ github.event.repository.name }}-sbom.spdx.json"
     runs-on: ubuntu-latest
     steps:
-      - name: DEBUG print release information from environment
-        run: |
-          echo 'SHA: ${{ github.sha }}'
-          echo 'REF: ${{ github.ref }}'
-      - uses: actions/checkout@v4
-      - name: Inspect repo information
-        run: |
-          git branch -v
-          git tag --list
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Parse release tag
+        run: echo RELEASE_TAG=$(echo $GITHUB_REF | cut -d '/' -f 3) | tee -a $GITHUB_ENV
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
         with:
@@ -25,3 +22,4 @@ jobs:
           path: null
           file: go.mod
           format: spdx-json
+          output-file: ${{ env.SBOM_FILE_NAME }}
