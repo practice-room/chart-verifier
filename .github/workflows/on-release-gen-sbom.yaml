@@ -20,5 +20,5 @@ jobs:
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
         with:
-          file: ./go.mod
+          file: go.mod
           format: spdx-json
