@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Determine last release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh version
           LATEST_RELEASE=$(\
@@ -19,6 +21,8 @@ jobs:
           echo LATEST_RELEASE="${LATEST_RELEASE}" | tee -a $GITHUB_ENV
       
       - name: Find Release SBOM
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           SBOM_URL=$(gh release view "${LATEST_RELEASE}" \
             --json assets \
