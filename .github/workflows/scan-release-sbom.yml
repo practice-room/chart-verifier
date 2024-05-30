@@ -1,0 +1,45 @@
+name: Scan latest release SBOM
+
+# Find the latest release, pull its SBOM (if it exists), and scan the result.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  grype:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine last release
+        run: |
+          gh version
+          LATEST_RELEASE=$(\
+          gh release list \
+            --json tagName,name,isLatest \
+            --jq '.[] | select(.isLatest==true) | .tagName')
+          echo LATEST_RELEASE="${LATEST_RELEASE}" | tee -a $GITHUB_ENV
+      
+      - name: Find Release SBOM
+        run: |
+          SBOM_URL=$(gh release view "${LATEST_RELEASE}" \
+            --json assets \
+            --jq '.assets[] | select(.name | contains("sbom")) | .url')
+          # TODO - handle a returned array if multiple SBOMS exist
+          echo SBOM_URL="${SBOM_URL}" | tee -a $GITHUB_ENV
+      - name: Pull SBOM
+        run: wget "${SBOM_URL}" -O release.sbom
+      - name: Scan SBOM
+        id: scan
+        uses: anchore/scan-action@v3
+        continue-on-error: true
+        with:
+          sbom: release.sbom
+          # We will handle failures
+          fail-build: true 
+          only-fixed: true
+          by-cve: true
+          severity-cutoff: ${{ vars.GRYPE_SEVERITY_CUTOFF || 'high' }}
+          output-format: json
+      - name: Notify on failure
+        if: ${{ steps.scan.outcome == 'failure' }}
+        run: |
+          echo "TODO: implement notification!"
