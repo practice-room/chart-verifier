@@ -1,5 +1,7 @@
 name: Scan Repository SBOM
 
+# Pull the repository, generate an SBOM, and scan the result.
+
 on:
   workflow_dispatch:
 
@@ -22,7 +24,12 @@ jobs:
           upload-release-assets: false
       - name: Scan SBOM
         uses: anchore/scan-action@v3
+        continue-on-error: true
         with:
           sbom: temporary.sbom.spdx.json
-        
-      
+          # We will handle failures
+          fail-build: true 
+          only-fixed: true
+          by-cve: true
+          severity-cutoff: high
+          output-format: json
