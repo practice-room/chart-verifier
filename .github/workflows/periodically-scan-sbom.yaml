@@ -23,6 +23,7 @@ jobs:
           upload-artifact: false
           upload-release-assets: false
       - name: Scan SBOM
+        id: scan
         uses: anchore/scan-action@v3
         continue-on-error: true
         with:
@@ -31,5 +32,9 @@ jobs:
           fail-build: true 
           only-fixed: true
           by-cve: true
-          severity-cutoff: high
+          severity-cutoff: ${{ vars.GRYPE_SEVERITY_CUTOFF || 'high' }}
           output-format: json
+      - name: Notify on failure
+        if: ${{ steps.scan.outcome == 'failure' }}
+        run: |
+          echo "TODO: implement notification!"
