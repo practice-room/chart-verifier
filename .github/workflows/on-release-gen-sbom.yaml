@@ -1,0 +1,24 @@
+name: Generate SBOM on release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  generate-src-sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: DEBUG print release information from environment
+        run: |
+          echo 'SHA: ${{ github.sha }}'
+          echo 'REF: ${{ github.ref }}'
+      - uses: actions/checkout@v4
+      - name: Inspect repo information
+        run: |
+          git branch -v
+          git tag --list
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          file: ./go.mod
+          format: spdx-json
