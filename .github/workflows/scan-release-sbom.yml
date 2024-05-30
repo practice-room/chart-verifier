@@ -16,6 +16,7 @@ jobs:
           gh version
           LATEST_RELEASE=$(\
           gh release list \
+            --repo ${{ github.repository }} \
             --json tagName,name,isLatest \
             --jq '.[] | select(.isLatest==true) | .tagName')
           echo LATEST_RELEASE="${LATEST_RELEASE}" | tee -a $GITHUB_ENV
@@ -25,6 +26,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           SBOM_URL=$(gh release view "${LATEST_RELEASE}" \
+            --repo ${{ github.repository }} \
             --json assets \
             --jq '.assets[] | select(.name | contains("sbom")) | .url')
           # TODO - handle a returned array if multiple SBOMS exist
