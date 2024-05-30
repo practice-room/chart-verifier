@@ -6,14 +6,14 @@ on:
 
 jobs:
   generate-src-sbom:
-    env:
-      SBOM_FILE_NAME: "${{ github.event.repository.name }}-sbom.spdx.json"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Parse release tag
         run: echo RELEASE_TAG=$(echo $GITHUB_REF | cut -d '/' -f 3) | tee -a $GITHUB_ENV
+      - name: Set output filename
+        run: echo SBOM_OUTPUT_FILE="${{ github.event.repository.name }}-${{ env.RELEASE_TAG }}-sbom.spdx.json" | tee -a $GITHUB_ENV
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
         with:
@@ -22,4 +22,5 @@ jobs:
           path: null
           file: go.mod
           format: spdx-json
-          output-file: ${{ env.SBOM_FILE_NAME }}
+          output-file: ${{ env.SBOM_OUTPUT_FILE }}
+          artifact-name: ${{ env.SBOM_OUTPUT_FILE }}
