@@ -38,8 +38,9 @@ jobs:
     needs: [find-release-and-sboms]
     strategy:
       matrix:
-        url: ${{ toJson(needs.find-release-and-sboms.outputs.sbom-array) }}
+        url: ${{ fromJson(needs.find-release-and-sboms.outputs.sbom-array) }}
     steps:
       - name: check matrix
         run: |
           echo ${{ matrix.url }}
+
