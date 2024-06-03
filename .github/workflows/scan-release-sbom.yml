@@ -6,8 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  grype:
+  find-release-and-sboms:
     runs-on: ubuntu-latest
+    outputs:
+      sbom-array: ${{ steps.find-release-sboms.outputs.SBOM_URL_ARRAY}}
     steps:
       - name: Determine last release
         env:
@@ -22,30 +24,22 @@ jobs:
           echo LATEST_RELEASE="${LATEST_RELEASE}" | tee -a $GITHUB_ENV
       
       - name: Find Release SBOM
+        id: find-release-sboms
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          SBOM_URL=$(gh release view "${LATEST_RELEASE}" \
+          SBOM_URL_ARRAY=$(gh release view "${LATEST_RELEASE}" \
             --repo ${{ github.repository }} \
             --json assets \
-            --jq '.assets[] | select(.name | contains("sbom")) | .url')
-          # TODO - handle a returned array if multiple SBOMS exist
-          echo SBOM_URL="${SBOM_URL}" | tee -a $GITHUB_ENV
-      - name: Pull SBOM
-        run: wget "${SBOM_URL}" -O release.sbom
-      - name: Scan SBOM
-        id: scan
-        uses: anchore/scan-action@v3
-        continue-on-error: true
-        with:
-          sbom: release.sbom
-          # We will handle failures
-          fail-build: true 
-          only-fixed: true
-          by-cve: true
-          severity-cutoff: ${{ vars.GRYPE_SEVERITY_CUTOFF || 'high' }}
-          output-format: json
-      - name: Notify on failure
-        if: ${{ steps.scan.outcome == 'failure' }}
+            --jq '[.assets[] | select(.name | contains("sbom")) | .url]')
+          echo SBOM_URL_ARRAY="${SBOM_URL_ARRAY}" | tee -a $GITHUB_OUTPUT
+  pull-and-scan:
+    runs-on: ubuntu-latest
+    needs: [find-release-and-sboms]
+    strategy:
+      matrix:
+        url: ${{ toJson(needs.find-release-and-sboms.sbom-array) }}
+    steps:
+      - name: check matrix
         run: |
-          echo "TODO: implement notification!"
+          echo ${{ matrix.url }}
