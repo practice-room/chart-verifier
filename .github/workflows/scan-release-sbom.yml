@@ -1,14 +1,17 @@
 name: Scan latest release SBOM
 
-# Find the latest release, pull its SBOM (if it exists), and scan the result.
+# Find the latest release, pull its SBOMs (if they exists), and scan the result.
 
 on:
   workflow_dispatch:
 
 jobs:
   find-release-and-sboms:
+    # Looks for the repository's latest release and returns an array containing
+    # the URL(s) of all files containing "sbom" in their name.
     runs-on: ubuntu-latest
     outputs:
+      # E.g. '["https://github.com/...", "https://github.com/..."]'
       sbom-array: ${{ steps.find-release-sboms.outputs.SBOM_URL_ARRAY}}
     steps:
       - name: Determine last release
@@ -32,15 +35,35 @@ jobs:
             --repo ${{ github.repository }} \
             --json assets \
             --jq '[.assets[] | select(.name | contains("sbom")) | .url]')
-          echo SBOM_URL_ARRAY="${SBOM_URL_ARRAY}" | tee -a $GITHUB_OUTPUT
+          echo SBOM_URL_ARRAY="${SBOM_URL_ARRAY}" | tee -a $GITHUB_OUTPUT\
+          
   pull-and-scan:
+    # Pulls each SBOM input URL and scans it with Grype. Notifies if there are
+    # vulnerabilities higher than the specified threshold.
     runs-on: ubuntu-latest
     needs: [find-release-and-sboms]
     strategy:
       matrix:
         url: ${{ fromJson(needs.find-release-and-sboms.outputs.sbom-array) }}
     steps:
-      - name: check matrix
-        run: |
-          echo ${{ matrix.url }}
 
+      - name: Pull SBOM
+        run: wget "${{ matrix.url }}" -O release.sbom
+      
+      - name: Scan SBOM
+        id: scan
+        uses: anchore/scan-action@v3
+        continue-on-error: true
+        with:
+          sbom: release.sbom
+          # We will handle failures
+          fail-build: true 
+          only-fixed: true
+          by-cve: true
+          severity-cutoff: ${{ vars.GRYPE_SEVERITY_CUTOFF || 'high' }}
+          output-format: json
+
+      - name: Notify on failure
+        if: ${{ steps.scan.outcome == 'failure' }}
+        run: |
+          echo "TODO: implement notification!"
