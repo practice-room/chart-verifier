@@ -196,7 +196,7 @@ jobs:
             - name: Create release tag
               id: create_release_tag
               if: ${{ steps.check_version_updated.outputs.updated == 'true'}}
-              uses: mathieudutour/github-tag-action@v6.1
+              uses: mathieudutour/github-tag-action@v6.2
               with:
                 # It is necessary to use a Personal Access Token here rather than the usual GITHUB_TOKEN, as this
                 # step should trigger the release.yaml workflow, and events (such as tags) triggered by the
