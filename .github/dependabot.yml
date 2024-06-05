@@ -22,9 +22,11 @@ updates:
     open-pull-requests-limit: 10
   - package-ecosystem: pip
     groups:
-      e2e:
+      testing:
         applies-to: "version-updates"
+        patterns:
+          - "*"
     directory: "/scripts"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 12
