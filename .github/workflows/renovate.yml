@@ -14,7 +14,7 @@ jobs:
           LOG_LEVEL: debug
           RENOVATE_REPOSITORIES: ${{ github.repository }}
           RENOVATE_PLATFORM: github
-      uses: renovatebot/github-action@v40.1.11
+      uses: renovatebot/github-action@v40.1.12
       with:
         token: ${{ github.token }}
         # configurationFile: renovate.json5
